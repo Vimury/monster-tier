@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monster Energy — разбор вкуса</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="drink">
+
+<div class="bg-fx" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="logo" href="index.html">
+    <span class="logo__claw">|||</span>
+    <span class="logo__txt">MONSTER<b>TIER</b></span>
+  </a>
+  <div class="topbar__tools">
+    <a class="btn" href="index.html">← К тирлисту</a>
+    <button id="editPageBtn" class="btn btn-admin" type="button" hidden>✏️ Редактировать</button>
+    <button id="authBtn" class="btn" type="button">🔒 Войти</button>
+  </div>
+</header>
+
+<main class="wrap" id="detail"></main>
+
+<!-- Модалка авторизации -->
+<div class="modal" id="loginModal" hidden>
+  <div class="modal__content modal--sm">
+    <h2>🔐 Вход в админку</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Логин</label>
+        <input type="text" name="login" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" name="password" required autocomplete="current-password">
+      </div>
+      <p class="form-error" id="loginError" hidden>Неверный логин или пароль</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+        <button type="button" class="btn" id="cancelLogin">Отмена</button>
+        <button type="submit" class="btn btn-primary">Войти</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Модалка редактирования блока -->
+<div class="modal" id="editModal" hidden>
+  <div class="modal__content">
+    <h2 id="editTitle">Редактировать блок</h2>
+    <form id="editForm"></form>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button type="button" class="btn" id="cancelEdit">Отмена</button>
+      <button type="submit" class="btn btn-primary" form="editForm">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>Неофициальный фан-проект. Не реклама. Оценка субъективная, цифры приблизительные.</p>
+  <p>18+ · не смешивать с алкоголем · не более 1 банки в день.</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

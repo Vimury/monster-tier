@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Админка — Monster Tier</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .admin{max-width:1200px;margin:0 auto;padding:20px}
+  .admin h1{margin-bottom:20px}
+  .admin__controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .admin__list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .admin__card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .admin__card h3{margin:0 0 10px;font-size:16px}
+  .admin__card p{margin:4px 0;font-size:13px;color:var(--muted)}
+  .admin__card-actions{display:flex;gap:8px;margin-top:12px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+  .modal__content{background:var(--panel);border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto}
+  .modal__content h2{margin:0 0 20px}
+  .form-group{margin-bottom:16px}
+  .form-group label{display:block;margin-bottom:6px;font-size:13px;font-weight:600}
+  .form-group input,.form-group select,.form-group textarea{
+    width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel2);color:var(--txt);font-size:14px;
+  }
+  .form-group textarea{min-height:80px;resize:vertical}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn-primary{background:var(--acid);color:#000;border-color:var(--acid)}
+  .btn-danger{background:var(--SSS);color:#fff;border-color:var(--SSS)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html">
+    <span class="logo__claw">|||</span>
+    <span class="logo__txt">MONSTER<b>TIER</b></span>
+  </a>
+  <div class="topbar__tools">
+    <a class="btn" href="index.html">← К тирлисту</a>
+  </div>
+</header>
+
+<main class="admin">
+  <h1>⚙️ Админка — Управление напитками</h1>
+  
+  <div class="admin__controls">
+    <button class="btn btn-primary" id="addDrink">+ Добавить напиток</button>
+    <button class="btn" id="exportData">📥 Экспорт JSON</button>
+    <button class="btn" id="importData">📤 Импорт JSON</button>
+    <input type="file" id="importFile" accept=".json" hidden>
+  </div>
+
+  <div class="admin__list" id="drinkList"></div>
+</main>
+
+<div class="modal" id="editModal" hidden>
+  <div class="modal__content">
+    <h2 id="modalTitle">Редактировать напиток</h2>
+    <form id="drinkForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>ID (уникальный)</label>
+          <input type="text" name="id" required>
+        </div>
+        <div class="form-group">
+          <label>Тир</label>
+          <select name="tier">
+            <option value="SSS">SSS</option>
+            <option value="S">S</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="UNRATED">Неоценен</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Полное название</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+          <label>Краткое название</label>
+          <input type="text" name="shortName" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Название на банке</label>
+        <input type="text" name="canName" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Линейка</label>
+          <select name="line">
+            <option value="ULTRA">ULTRA</option>
+            <option value="JUICE">JUICE</option>
+            <option value="ORIGINAL">ORIGINAL</option>
+            <option value="REHAB">REHAB</option>
+            <option value="JAVA">JAVA</option>
+            <option value="NITRO">NITRO</option>
+            <option value="MULE">MULE</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Год выпуска</label>
+          <input type="text" name="year" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Слоган</label>
+        <input type="text" name="tagline" required>
+      </div>
+
+      <div class="form-group">
+        <label>Краткое описание</label>
+        <textarea name="short" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Теги (через запятую)</label>
+        <input type="text" name="tags" placeholder="цитрус, 0 сахара, классика">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Кофеин</label>
+          <input type="text" name="caffeine" placeholder="≈150 мг">
+        </div>
+        <div class="form-group">
+          <label>Сахар</label>
+          <input type="text" name="sugar" placeholder="0 г">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Калории</label>
+          <input type="text" name="kcal" placeholder="≈10 ккал">
+        </div>
+        <div class="form-group">
+          <label>Объём</label>
+          <input type="text" name="volume" placeholder="500 мл">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Оценка (0-10)</label>
+        <input type="number" name="score" min="0" max="10" step="0.1" required>
+      </div>
+
+      <div class="form-group">
+        <label>Приоритет</label>
+        <select name="priority">
+          <option value="">Нет</option>
+          <option value="+">+ (высокий)</option>
+          <option value="-">- (низкий)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Подробное описание (каждый абзац с новой строки)</label>
+        <textarea name="about" rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Плюсы (каждый с новой строки)</label>
+        <textarea name="pros" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Минусы (каждый с новой строки)</label>
+        <textarea name="cons" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Вердикт</label>
+        <textarea name="verdict" rows="2"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Цвета (основной, второй, акцент, текст)</label>
+        <div class="form-row">
+          <input type="color" name="body" value="#f4f6f9">
+          <input type="color" name="body2" value="#c3c9d4">
+          <input type="color" name="accent" value="#8b93a1">
+          <input type="color" name="ink" value="#1a1d23">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Цвет свечения</label>
+        <input type="color" name="glow" value="#e6ecf7">
+      </div>
+
+      <div class="form-group">
+        <label>Профиль вкуса (1-10)</label>
+        <div class="form-row">
+          <div>
+            <label style="font-size:12px">Сладость</label>
+            <input type="number" name="profile-Сладость" min="1" max="10" value="5">
+          </div>
+          <div>
+            <label style="font-size:12px">Кислотность</label>
+            <input type="number" name="profile-Кислотность" min="1" max="10" value="5">
+          </div>
+          <div>
+            <label style="font-size:12px">Газированность</label>
+            <input type="number" name="profile-Газированность" min="1" max="10" value="5">
+          </div>
+          <div>
+            <label style="font-size:12px">Фруктовость</label>
+            <input type="number" name="profile-Фруктовость" min="1" max="10" value="5">
+          </div>
+          <div>
+            <label style="font-size:12px">Послевкусие</label>
+            <input type="number" name="profile-Послевкусие" min="1" max="10" value="5">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px">
+        <button type="button" class="btn" id="cancelEdit">Отмена</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+let editingId = null;
+
+function renderList(){
+  const list = $('#drinkList');
+  list.innerHTML = DRINKS.map(d => `
+    <div class="admin__card">
+      <h3>${d.shortName}</h3>
+      <p><strong>Тир:</strong> ${d.tier}</p>
+      <p><strong>Оценка:</strong> ${d.score}</p>
+      <p><strong>Линейка:</strong> ${d.line}</p>
+      <div class="admin__card-actions">
+        <button class="btn" onclick="editDrink('${d.id}')">✏️ Редактировать</button>
+        <button class="btn btn-danger" onclick="deleteDrink('${d.id}')">🗑️ Удалить</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editDrink(id){
+  editingId = id;
+  const d = DRINKS.find(x => x.id === id);
+  const form = $('#drinkForm');
+  
+  form.id.value = d.id;
+  form.tier.value = d.tier;
+  form.name.value = d.name;
+  form.shortName.value = d.shortName;
+  form.canName.value = d.canName;
+  form.line.value = d.line;
+  form.year.value = d.year;
+  form.tagline.value = d.tagline;
+  form.short.value = d.short;
+  form.tags.value = d.tags.join(', ');
+  form.caffeine.value = d.caffeine;
+  form.sugar.value = d.sugar;
+  form.kcal.value = d.kcal;
+  form.volume.value = d.volume;
+  form.score.value = d.score;
+  form.priority.value = d.priority;
+  form.about.value = d.about.join('\n');
+  form.pros.value = d.pros.join('\n');
+  form.cons.value = d.cons.join('\n');
+  form.verdict.value = d.verdict;
+  form.body.value = d.colors.body;
+  form.body2.value = d.colors.body2;
+  form.accent.value = d.colors.accent;
+  form.ink.value = d.colors.ink;
+  form.glow.value = d.glow;
+  
+  Object.entries(d.profile).forEach(([k,v]) => {
+    form[`profile-${k}`].value = v;
+  });
+  
+  $('#modalTitle').textContent = 'Редактировать: ' + d.shortName;
+  $('#editModal').hidden = false;
+}
+
+function deleteDrink(id){
+  if(!confirm('Удалить этот напиток?')) return;
+  const idx = DRINKS.findIndex(d => d.id === id);
+  if(idx > -1){
+    DRINKS.splice(idx, 1);
+    saveToStorage();
+    renderList();
+  }
+}
+
+$('#addDrink').addEventListener('click', () => {
+  editingId = null;
+  $('#drinkForm').reset();
+  $('#drinkForm').id.value = 'new-drink-' + Date.now();
+  $('#modalTitle').textContent = 'Добавить напиток';
+  $('#editModal').hidden = false;
+});
+
+$('#cancelEdit').addEventListener('click', () => {
+  $('#editModal').hidden = true;
+});
+
+$('#drinkForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target;
+  
+  const drink = {
+    id: form.id.value,
+    tier: form.tier.value,
+    priority: form.priority.value,
+    score: parseFloat(form.score.value),
+    name: form.name.value,
+    shortName: form.shortName.value,
+    canName: form.canName.value,
+    line: form.line.value,
+    year: form.year.value,
+    tagline: form.tagline.value,
+    short: form.short.value,
+    tags: form.tags.value.split(',').map(t => t.trim()).filter(t => t),
+    caffeine: form.caffeine.value,
+    sugar: form.sugar.value,
+    kcal: form.kcal.value,
+    volume: form.volume.value,
+    about: form.about.value.split('\n').filter(p => p.trim()),
+    pros: form.pros.value.split('\n').filter(p => p.trim()),
+    cons: form.cons.value.split('\n').filter(p => p.trim()),
+    verdict: form.verdict.value,
+    colors: {
+      body: form.body.value,
+      body2: form.body2.value,
+      accent: form.accent.value,
+      ink: form.ink.value
+    },
+    glow: form.glow.value,
+    profile: {
+      Сладость: parseInt(form['profile-Сладость'].value),
+      Кислотность: parseInt(form['profile-Кислотность'].value),
+      Газированность: parseInt(form['profile-Газированность'].value),
+      Фруктовость: parseInt(form['profile-Фруктовость'].value),
+      Послевкусие: parseInt(form['profile-Послевкусие'].value)
+    }
+  };
+  
+  if(editingId){
+    const idx = DRINKS.findIndex(d => d.id === editingId);
+    if(idx > -1) DRINKS[idx] = drink;
+  } else {
+    DRINKS.push(drink);
+  }
+  
+  saveToStorage();
+  renderList();
+  $('#editModal').hidden = true;
+});
+
+$('#exportData').addEventListener('click', () => {
+  const data = JSON.stringify(DRINKS, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'monster-drinks.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+$('#importData').addEventListener('click', () => {
+  $('#importFile').click();
+});
+
+$('#importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = event => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if(Array.isArray(data)){
+        DRINKS.length = 0;
+        DRINKS.push(...data);
+        saveToStorage();
+        renderList();
+        alert('Данные импортированы!');
+      }
+    } catch(err){
+      alert('Ошибка импорта: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+function saveToStorage(){
+  localStorage.setItem('monster-drinks-data', JSON.stringify(DRINKS));
+}
+
+function loadFromStorage(){
+  const saved = localStorage.getItem('monster-drinks-data');
+  if(saved){
+    try {
+      const data = JSON.parse(saved);
+      DRINKS.length = 0;
+      DRINKS.push(...data);
+    } catch(e){
+      console.warn('Не удалось загрузить данные из localStorage');
+    }
+  }
+}
+
+loadFromStorage();
+renderList();
+</script>
+</body>
+</html>

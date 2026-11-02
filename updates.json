@@ -1,0 +1,47 @@
+{
+  "currentVersion": "1.0",
+  "updates": [
+    {
+      "version": "1.1",
+      "date": "2026-11-02",
+      "changes": [
+        {
+          "type": "add",
+          "drink": {
+            "id": "ultra-watermelon",
+            "tier": "UNRATED",
+            "priority": "",
+            "price": 170,
+            "score": 0,
+            "name": "Monster Energy Ultra Watermelon",
+            "shortName": "Ultra Watermelon",
+            "canName": "WATERMELON",
+            "line": "ULTRA",
+            "tagline": "Арбузная свежесть",
+            "short": "Спелый арбуз. Сладкий, освежающий.",
+            "tags": ["арбуз", "0 сахара", "летний"],
+            "colors": {"body": "#ff4d5e", "body2": "#2fa84f", "accent": "#12240f", "ink": "#fff2f3"},
+            "glow": "#ff4d5e",
+            "caffeine": "≈150 мг",
+            "sugar": "0 г",
+            "kcal": "≈10 ккал",
+            "volume": "500 мл",
+            "year": "2020",
+            "profile": {"Сладость": 7, "Кислотность": 4, "Газированность": 8, "Фруктовость": 8, "Послевкусие": 4},
+            "about": ["Ultra Watermelon — летний вкус. Спелый арбуз, сладкий и освежающий."],
+            "pros": ["Узнаваемый арбузный вкус", "0 сахара"],
+            "cons": ["Вкус ближе к жвачке"],
+            "verdict": "Ждёт оценки."
+          }
+        },
+        {
+          "type": "update",
+          "id": "ultra-white",
+          "fields": {
+            "description": "Обновлённое описание Ultra White"
+          }
+        }
+      ]
+    }
+  ]
+}
