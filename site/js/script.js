@@ -1,7 +1,7 @@
 /* ================= СИСТЕМА ОБНОВЛЕНИЙ ================= */
 async function checkForUpdates() {
   try {
-    const response = await fetch('updates.json');
+    const response = await fetch('../data/updates.json');
     if (!response.ok) return;
     
     const updatesData = await response.json();
